@@ -93,7 +93,7 @@ public class Checker {
 
         for (int j = 0; j < size; j++) {
             if (!compare(x.getArray()[j][0], rhs_r[j][0], epsilon)) {
-                System.out.println("Error " + size+1 + " " + j);
+                System.out.println("Error " + (size+1) + " " + j);
                 System.exit(0);
             }
         }
