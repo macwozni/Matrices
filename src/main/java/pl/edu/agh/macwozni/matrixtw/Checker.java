@@ -7,93 +7,77 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * @author macwozni
+ */
 public class Checker {
 
+    // machine precision epsilon
+    static double epsilon = 0.00001;
+
+    /**
+     * @param a first variable for comparisson
+     * @param b second variable for comparisson
+     * @param epsilon machine precission for floating point
+     * @return true if equals or within bounds of epsilon precission
+     */
     static boolean compare(double a, double b, double epsilon) {
-        double c = a - b;
-        if (c < 0.0) {
-            c *= -1.0;
-        }
-        if (c < epsilon) {
-            return true;
-        }
-        return false;
+        double c = Math.abs(a - b);
+        return c < epsilon;
     }
 
+    
+    
     public static void main(String args[]) throws FileNotFoundException, IOException {
 
-        double epsilon = 0.00001;
+        // if there are more or less arguments then 2 file addresses
+        if (args.length != 2) {
+            System.err.print("wrong amount of arguments");
+            System.exit(1);
+        }
 
-        //read source file
+        // read source file
+        // a file with unprocessed unsolved matrix
         File fil = new File(args[0]);
         FileReader inputFil = new FileReader(fil);
         BufferedReader in = new BufferedReader(inputFil);
 
-        String s = in.readLine();
+        // parse file and create data structure
+        MyMatrix source = new MyMatrix(in);
 
-        int size = Integer.parseInt(s);
-        double[][] lhs = new double[size][size];
-        double[][] rhs = new double[size][1];
-
-        for (int i = 0; i < size; i++) {
-            s = in.readLine();
-            String[] sp = s.split(" ");
-            for (int j = 0; j < size; j++) {
-                lhs[i][j] = Double.parseDouble(sp[j]);
-            }
-        }
-        s = in.readLine();
-        String[] sp = s.split(" ");
-        for (int j = 0; j < size; j++) {
-            rhs[j][0] = Double.parseDouble(sp[j]);
-        }
-
-        //solve
-        Matrix A = new Matrix(lhs);
-        Matrix b = new Matrix(rhs);
+        // solve
+        //create data structures for solver
+        Matrix A = new Matrix(source.lhs);
+        Matrix b = new Matrix(source.rhs);
+        // x=a/b
         Matrix x = A.solve(b);
 
-        //read output file
+        // read output file
+        // a file with processed/solved matrix
         fil = new File(args[1]);
         inputFil = new FileReader(fil);
         in = new BufferedReader(inputFil);
 
-        s = in.readLine();
+        // parse file and create data structure
+        MyMatrix processed = new MyMatrix(in);
 
-        size = Integer.parseInt(s);
-        double[][] lhs_r = new double[size][size];
-        double[][] rhs_r = new double[size][1];
-
-        for (int i = 0; i < size; i++) {
-            s = in.readLine();
-            sp = s.split(" ");
-            for (int j = 0; j < size; j++) {
-                lhs_r[i][j] = Double.parseDouble(sp[j]);
-            }
-        }
-        s = in.readLine();
-        sp = s.split(" ");
-        for (int j = 0; j < size; j++) {
-            rhs_r[j][0] = Double.parseDouble(sp[j]);
-        }
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < processed.size; i++) {
+            for (int j = 0; j < processed.size; j++) {
                 if (i == j) {
-                    if (!compare(1., lhs_r[i][j], epsilon)) {
+                    if (!compare(1., processed.lhs[i][j], epsilon)) {
                         System.out.println("Error " + i + " " + j);
                         System.exit(0);
                     }
-                } else if (!compare(0., lhs_r[i][j], epsilon)) {
+                } else if (!compare(0., processed.lhs[i][j], epsilon)) {
                     System.out.println("Error " + i + " " + j);
                     System.exit(0);
                 }
             }
         }
 
-        for (int j = 0; j < size; j++) {
-            if (!compare(x.getArray()[j][0], rhs_r[j][0], epsilon)) {
-                System.out.println("Error " + (size+1) + " " + j);
+        for (int j = 0; j < processed.size; j++) {
+            if (!compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
+                System.out.println("Error " + (processed.size + 1) + " " + j);
                 System.exit(0);
             }
         }
