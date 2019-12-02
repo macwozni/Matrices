@@ -1,0 +1,1 @@
+This is intended to be used during "Teoria Wspolbieznosci" classes.
