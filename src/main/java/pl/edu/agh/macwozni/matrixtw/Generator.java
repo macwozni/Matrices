@@ -111,21 +111,35 @@ public class Generator {
         System.out.println();
     }
 
+    /**
+     * @param m matrix for gaussian elimination
+     * @param size size of the matrix
+     * @return true if matrix requires pivoting during gaussian elimination
+     * This subroutine checks if matrix requires pivoting during simple gaussian elimination.
+     */
     static boolean requiresPivot(double m[][], int size) {
+        // make a local copy - just in case
         double[][] matrix = m;
 
+        // for each row
         for (int i = 0; i < size; i++) {
+            // check if we have 0.0 on diagonal
             if (MyMatrix.compare(0., matrix[i][i], epsilon)) {
+                // if yes - return true
                 return true;
             }
+            // for each row below
             for (int j=i+1; j<size; j++){
+                // compute mulitplier
                 double n = matrix[j][i]/matrix[i][i];
+                // subtract each element of one row from another
                 for (int k=0; k<size; k++){
                     matrix[j][k] = matrix[j][k] - matrix[i][k]*n;
                 }
             }
         }
 
+        // now we know, that pivoting is not required during elimination
         return false;
     }
 }
