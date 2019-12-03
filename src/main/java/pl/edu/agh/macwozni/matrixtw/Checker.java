@@ -26,8 +26,11 @@ public class Checker {
         return c < epsilon;
     }
 
-    
-    
+    /**
+     * @param args should be 2 strings with addresses of 2 files with matrixes at given format
+     * @throws FileNotFoundException if the give file does not exist we just frow exception - from main subroutine...
+     * @throws IOException if there is some problem with IO we just frow exception - from main subroutine...
+     */
     public static void main(String args[]) throws FileNotFoundException, IOException {
 
         // if there are more or less arguments then 2 file addresses
@@ -61,22 +64,29 @@ public class Checker {
         // parse file and create data structure
         MyMatrix processed = new MyMatrix(in);
 
+        // in processed/solved matrix it should be 1 on diagonal and 0 elsewhere
         for (int i = 0; i < processed.size; i++) {
             for (int j = 0; j < processed.size; j++) {
+                // if diagonal - should be 1.0
                 if (i == j) {
+                    // if it is not 1.0 - print it to the output and exit
                     if (!compare(1., processed.lhs[i][j], epsilon)) {
                         System.out.println("Error " + i + " " + j);
                         System.exit(0);
                     }
+                    //if  not diagonal - should be 0.0
                 } else if (!compare(0., processed.lhs[i][j], epsilon)) {
+                    // if it is not 0.0 - print it to the output and exit
                     System.out.println("Error " + i + " " + j);
                     System.exit(0);
                 }
             }
         }
 
+        // check RHS vector - should be equal to the one from solved here initial problem
         for (int j = 0; j < processed.size; j++) {
             if (!compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
+                // if it is not equal - print it to the output and exit
                 System.out.println("Error " + (processed.size + 1) + " " + j);
                 System.exit(0);
             }
