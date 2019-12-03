@@ -79,14 +79,14 @@ public class Checker {
             }
         }
 
-        System.out.print(x.getArray()[1][0]);
+        System.out.print(x.getArray()[0][0]);
         for (int j = 1; j < processed.size; j++) {
             System.out.print(" ");
             System.out.print(x.getArray()[j][0]);
         }
         System.out.println();
         
-        System.out.print(processed.rhs[1][0]);
+        System.out.print(processed.rhs[0][0]);
         for (int j = 1; j < processed.size; j++) {
             System.out.print(" ");
             System.out.print(processed.rhs[j][0]);

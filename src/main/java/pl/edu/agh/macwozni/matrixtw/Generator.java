@@ -115,7 +115,7 @@ public class Generator {
         // solve system of equations
         Matrix x = A.solve(B);
         // print solution
-        System.out.print(x.getArray()[1][0]);
+        System.out.print(x.getArray()[0][0]);
         for (int j = 1; j < n; j++) {
             System.out.print(" ");
             System.out.print(x.getArray()[j][0]);
