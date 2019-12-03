@@ -16,17 +16,6 @@ public class Checker {
     static double epsilon = 0.00001;
 
     /**
-     * @param a first variable for comparisson
-     * @param b second variable for comparisson
-     * @param epsilon machine precission for floating point
-     * @return true if equals or within bounds of epsilon precission
-     */
-    static boolean compare(double a, double b, double epsilon) {
-        double c = Math.abs(a - b);
-        return c < epsilon;
-    }
-
-    /**
      * @param args should be 2 strings with addresses of 2 files with matrixes at given format
      * @throws FileNotFoundException if the give file does not exist we just frow exception - from main subroutine...
      * @throws IOException if there is some problem with IO we just frow exception - from main subroutine...
@@ -70,12 +59,12 @@ public class Checker {
                 // if diagonal - should be 1.0
                 if (i == j) {
                     // if it is not 1.0 - print it to the output and exit
-                    if (!compare(1., processed.lhs[i][j], epsilon)) {
+                    if (!MyMatrix.compare(1., processed.lhs[i][j], epsilon)) {
                         System.out.println("Error " + i + " " + j);
                         System.exit(0);
                     }
                     //if  not diagonal - should be 0.0
-                } else if (!compare(0., processed.lhs[i][j], epsilon)) {
+                } else if (!MyMatrix.compare(0., processed.lhs[i][j], epsilon)) {
                     // if it is not 0.0 - print it to the output and exit
                     System.out.println("Error " + i + " " + j);
                     System.exit(0);
@@ -85,7 +74,7 @@ public class Checker {
 
         // check RHS vector - should be equal to the one from solved here initial problem
         for (int j = 0; j < processed.size; j++) {
-            if (!compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
+            if (!MyMatrix.compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
                 // if it is not equal - print it to the output and exit
                 System.out.println("Error " + (processed.size + 1) + " " + j);
                 System.exit(0);

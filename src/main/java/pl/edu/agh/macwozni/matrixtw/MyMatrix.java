@@ -41,4 +41,15 @@ public class MyMatrix {
             rhs[j][0] = Double.parseDouble(sp[j]);
         }
     }
+    
+    /**
+     * @param a first variable for comparisson
+     * @param b second variable for comparisson
+     * @param epsilon machine precission for floating point
+     * @return true if equals or within bounds of epsilon precission
+     */
+    static boolean compare(double a, double b, double epsilon) {
+        double c = Math.abs(a - b);
+        return c < epsilon;
+    }
 }
