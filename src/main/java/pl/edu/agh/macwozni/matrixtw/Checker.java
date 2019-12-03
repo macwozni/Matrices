@@ -22,6 +22,13 @@ public class Checker {
      */
     public static void main(String args[]) throws FileNotFoundException, IOException {
 
+        // print arguments count
+        System.out.println(args.length);
+        // print arguments list
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+        
         // if there are more or less arguments then 2 file addresses
         if (args.length != 2) {
             System.err.print("wrong amount of arguments");
@@ -60,23 +67,38 @@ public class Checker {
                 if (i == j) {
                     // if it is not 1.0 - print it to the output and exit
                     if (!MyMatrix.compare(1., processed.lhs[i][j], epsilon)) {
-                        System.out.println("Error " + i + " " + j);
+                        System.out.println("Error 1 " + i + " " + j);
                         System.exit(0);
                     }
                     //if  not diagonal - should be 0.0
                 } else if (!MyMatrix.compare(0., processed.lhs[i][j], epsilon)) {
                     // if it is not 0.0 - print it to the output and exit
-                    System.out.println("Error " + i + " " + j);
+                    System.out.println("Error 2 " + i + " " + j);
                     System.exit(0);
                 }
             }
         }
 
+        System.out.print(x.getArray()[1][0]);
+        for (int j = 1; j < processed.size; j++) {
+            System.out.print(" ");
+            System.out.print(x.getArray()[j][0]);
+        }
+        System.out.println();
+        
+        System.out.print(processed.rhs[1][0]);
+        for (int j = 1; j < processed.size; j++) {
+            System.out.print(" ");
+            System.out.print(processed.rhs[j][0]);
+        }
+        System.out.println();
+        
         // check RHS vector - should be equal to the one from solved here initial problem
         for (int j = 0; j < processed.size; j++) {
             if (!MyMatrix.compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
                 // if it is not equal - print it to the output and exit
-                System.out.println("Error " + (processed.size + 1) + " " + j);
+                System.out.println("Error 3 " + (processed.size + 1) + " " + j);
+                System.out.println(x.getArray()[j][0] + " " + processed.rhs[j][0]);
                 System.exit(0);
             }
         }
