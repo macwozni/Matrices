@@ -69,26 +69,16 @@ public class Generator {
         // print matrix size
         System.out.println(n);
         // print matrix
-        System.out.print(A.getArray()[0][1]);
-        for (int j = 1; j < n; j++) {
-            System.out.print(" ");
-            System.out.print(A.getArray()[0][j]);
-        }
-        System.out.println();
-        for (int i = 1; i < n; i++) {
-            System.out.print(A.getArray()[i][0]);
-            for (int j = 1; j < n; j++) {
-                System.out.print(" ");
-                System.out.print(A.getArray()[i][j]);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print(A.getArray()[i][j] + " ");
             }
             System.out.println();
         }
 
         // print RHS
-        System.out.print(B.getArray()[1][0]);
-        for (int j = 1; j < n; j++) {
-            System.out.print(" ");
-            System.out.print(B.getArray()[j][0]);
+        for (int j = 0; j < n; j++) {
+            System.out.print(B.getArray()[j][0] + " ");
         }
         System.out.println();
 
@@ -115,10 +105,8 @@ public class Generator {
         // solve system of equations
         Matrix x = A.solve(B);
         // print solution
-        System.out.print(x.getArray()[0][0]);
-        for (int j = 1; j < n; j++) {
-            System.out.print(" ");
-            System.out.print(x.getArray()[j][0]);
+        for (int j = 0; j < n; j++) {
+            System.out.print(x.getArray()[j][0] + " ");
         }
         System.out.println();
     }
