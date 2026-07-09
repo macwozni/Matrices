@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -21,7 +22,7 @@ public class Generator {
      * Absolute tolerance used when checking whether a floating-point value is
      * numerically zero.
      */
-    static final double EPSILON = 0.00001;
+    static final double EPSILON = 0.0000000001;
 
     /**
      * Generates a source matrix file and a matching reference solution file.
