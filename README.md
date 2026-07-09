@@ -26,7 +26,7 @@ The project uses the JAMA matrix library through Maven.
 Requirements
 ------------
 
-- Java 7 or newer
+- Java 8 or newer
 - Maven
 
 Build
@@ -142,6 +142,11 @@ If the result is incorrect, the checker prints one of the following errors:
 - `Error 2 i j` - a non-diagonal element at row `i`, column `j` is not equal to
   `0.0`.
 - `Error 3 i j` - the solution vector differs from the expected solution.
+- `Error size expected actual` - the processed matrix size differs from the
+  original matrix size.
+
+The checker exits with status code `0` when the result is correct and `1` when
+an error is detected.
 
 Numerical Precision
 -------------------
@@ -168,3 +173,4 @@ License / Usage
 
 This project is intended for educational use during the "Teoria Wspolbieznosci"
 classes.
+For noncommercial use only.

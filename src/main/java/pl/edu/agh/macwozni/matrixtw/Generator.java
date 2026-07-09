@@ -14,14 +14,6 @@ public class Generator {
     static double epsilon = 0.00001;
 
     public static void main(String args[]) throws FileNotFoundException, IOException {
-        
-        // print arguments count
-        System.out.println(args.length);
-        // print arguments list
-        for (String arg : args) {
-            System.out.println(arg);
-        }
-
         // if there are more or less arguments then matrix size and 2 file addresses
         if (args.length != 3) {
             System.err.print("wrong amount of arguments");
@@ -30,34 +22,18 @@ public class Generator {
 
         // parse matrix size
         int n = Integer.parseInt(args[0]);
-        
-        // generate random system of equations
-        // LHS
-        Matrix A = Matrix.random(n, n);
-        // RHS
-        Matrix B = Matrix.random(n, 1);
-        // try to solve system of equations
-        LUDecomposition lu = A.lu();
-        // check if it is non singular
-        boolean nonSingular = lu.isNonsingular();
-        // if it is non singular - check if it requires pivot during gaussian elimination
-        if (nonSingular){
-            nonSingular = requiresPivot(A.getArray(), n);
+        if (n <= 0) {
+            System.err.print("matrix size must be positive");
+            System.exit(1);
         }
-        // if it is non singular or requires pivot try to generate another system
-        // until we find something that meets our requirements
-        while (!nonSingular) {
+        
+        Matrix A;
+        Matrix B;
+        do {
             // generate random system of equations
             A = Matrix.random(n, n);
-            // try to solve system of equations
-            lu = A.lu();
-            // check if it is non singular
-            nonSingular = lu.isNonsingular();
-            // if it is non singular - check if it requires pivot during gaussian elimination
-            if (nonSingular){
-                nonSingular = requiresPivot(A.getArray(), n);
-            }
-        }
+            B = Matrix.random(n, 1);
+        } while (!isAcceptable(A, n));
         
         // open file for output - unsolved system of equations
         File file = new File(args[1]);
@@ -112,14 +88,27 @@ public class Generator {
     }
 
     /**
+     * @param matrix matrix for generated system
+     * @param size size of the matrix
+     * @return true if matrix is nonsingular and does not require pivoting
+     */
+    static boolean isAcceptable(Matrix matrix, int size) {
+        LUDecomposition lu = matrix.lu();
+        return lu.isNonsingular() && !requiresPivot(matrix.getArray(), size);
+    }
+
+    /**
      * @param m matrix for gaussian elimination
      * @param size size of the matrix
      * @return true if matrix requires pivoting during gaussian elimination
      * This subroutine checks if matrix requires pivoting during simple gaussian elimination.
      */
     static boolean requiresPivot(double m[][], int size) {
-        // make a local copy - just in case
-        double[][] matrix = m;
+        // Work on a copy so checking does not change the generated matrix.
+        double[][] matrix = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(m[i], 0, matrix[i], 0, size);
+        }
 
         // for each row
         for (int i = 0; i < size; i++) {
