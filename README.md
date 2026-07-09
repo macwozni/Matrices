@@ -1,56 +1,170 @@
-Tool for checking students implementation of Gaussian Elimination
-===========================
+MatrixTW
+========
+
+MatrixTW is a small Java/Maven project used during the "Teoria Wspolbieznosci"
+classes. It helps prepare and verify test cases for student implementations of
+Gaussian elimination.
+
+The project contains two command-line tools:
+
+- `Generator` creates a random system of linear equations.
+- `Checker` verifies whether a processed result file contains the expected
+  solution.
+
+Project Structure
+-----------------
+
+```text
+src/main/java/pl/edu/agh/macwozni/matrixtw/
+  Generator.java  Generates input and reference output files.
+  Checker.java    Checks a student's output file.
+  MyMatrix.java   Reads matrix files and compares floating-point values.
+```
+
+The project uses the JAMA matrix library through Maven.
+
+Requirements
+------------
+
+- Java 7 or newer
+- Maven
+
+Build
+-----
+
+Compile the project with:
+
+```bash
+mvn compile
+```
+
+You can also open the project in any IDE with Maven support, such as IntelliJ
+IDEA, Eclipse, or NetBeans.
+
+Matrix File Format
+------------------
+
+Matrix files use the following text format:
+
+```text
+<size>
+<matrix row 1>
+<matrix row 2>
+...
+<matrix row n>
+<right-hand-side vector>
+```
+
+Example:
+
+```text
+3
+1.2 1.5 1.6
+2.3 2.9 2.0
+3.0 3.1 3.3
+0.1 0.2 0.3
+```
+
+This represents a system with a `3 x 3` matrix:
+
+```text
+1.2 1.5 1.6
+2.3 2.9 2.0
+3.0 3.1 3.3
+```
+
+and a right-hand-side vector:
+
+```text
+0.1 0.2 0.3
+```
 
 Generator
--------------------------
-This is a tool to generate a system of linear equations.Besides generating system of equation it checks if this is singular and if it requires pivoting due to having numerical zero on diagonal during elimination.
+---------
 
-Input parameters to invoke:  
-[size of matrix - integer] [address of output file with system of equations - string] [address of output file with solved system of equations - string]
+`Generator` creates:
+
+1. An input file containing a generated system of linear equations `A * x = b`.
+2. A reference output file containing the identity matrix and the correct
+   solution vector `x`.
+
+Arguments:
+
+```text
+<matrix size> <input output file> <reference output file>
+```
+
+Example:
+
+```bash
+mvn exec:java \
+  -Dexec.mainClass=pl.edu.agh.macwozni.matrixtw.Generator \
+  -Dexec.args="10 out10.txt res10.txt"
+```
+
+The generated matrix is checked before being written. The generator avoids
+singular systems and systems that would require pivoting because of a numerical
+zero on the diagonal during simple Gaussian elimination.
 
 Checker
--------------------------
+-------
 
-This is a tool to check if solution from students implementation is correct. It checks if differences between solutions are numerical zero.
+`Checker` verifies a processed result file produced by a student's Gaussian
+elimination implementation.
 
-Input parameters to invoke:  
-[address of input file with system of equations - string] [address of input file with solved system of equations - string]
+Arguments:
 
-Numerical zero
--------------------------
+```text
+<input file with original system> <processed result file>
+```
 
-We define numerical zero as everything smaller than 0.00001.This is controlled by epsilon variable both in Generator and Checker independently.
+Example:
 
-Matrix file format
--------------------------
+```bash
+mvn exec:java \
+  -Dexec.mainClass=pl.edu.agh.macwozni.matrixtw.Checker \
+  -Dexec.args="out10.txt student_result.txt"
+```
 
-Files are formatted in following manner  
-[size - integer]  
-[matrix - double]  
-[RHS - double]
+The checker:
 
-For example:
+1. Reads the original system.
+2. Solves it using the JAMA library.
+3. Reads the processed result file.
+4. Checks whether the processed matrix is the identity matrix.
+5. Checks whether the processed right-hand-side vector matches the expected
+   solution.
 
-3  
-1.2 1.5 1.6  
-2.3 2.9 2.0  
-3.0 3.1 3.3  
-0.1 0.2 0.3
+If the result is incorrect, the checker prints one of the following errors:
 
-where matrix is of size 3 and has following value  
-1.2 1.5 1.6  
-2.3 2.9 2.0  
-3.0 3.1 3.3  
-and RHS has following value  
-0.1 0.2 0.3
+- `Error 1 i j` - the diagonal element at row `i`, column `j` is not equal to
+  `1.0`.
+- `Error 2 i j` - a non-diagonal element at row `i`, column `j` is not equal to
+  `0.0`.
+- `Error 3 i j` - the solution vector differs from the expected solution.
 
+Numerical Precision
+-------------------
 
-Project type
--------------------------
+Floating-point values are compared with an epsilon tolerance:
 
-This is a simple Maven project. Compile with mvn, or any IDE that support Maven - for example: IntelliJ, Eclipse, NetBeans and many more.
+```text
+0.00001
+```
 
-Usage permission
--------------------------
+Two values are treated as equal when their absolute difference is smaller than
+this tolerance.
 
-This is intended to be used during "Teoria Wspolbieznosci" classes.
+Example Files
+-------------
+
+The repository contains example files:
+
+- `out10.txt` - an example generated system.
+- `res10.txt` - the corresponding reference result.
+
+License / Usage
+---------------
+
+This project is intended for educational use during the "Teoria Wspolbieznosci"
+classes.
