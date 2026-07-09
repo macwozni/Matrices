@@ -3,6 +3,7 @@ package pl.edu.agh.macwozni.matrixtw;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -17,7 +18,7 @@ public class Checker {
     /**
      * Absolute tolerance used when comparing floating-point values.
      */
-    static final double EPSILON = 0.00001;
+    static final double EPSILON = 0.0000000001;
 
     /**
      * Validates a processed matrix file against a source matrix file.

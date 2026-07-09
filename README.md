@@ -210,7 +210,7 @@ Numerical Precision
 Floating-point values are compared with an epsilon tolerance:
 
 ```text
-0.00001
+0.0000000001
 ```
 
 Two values are treated as equal when their absolute difference is smaller than
