@@ -21,13 +21,13 @@ src/main/java/pl/edu/agh/macwozni/matrixtw/
   MyMatrix.java   Reads matrix files and compares floating-point values.
 ```
 
-The project uses the JAMA matrix library through Maven.
+The project uses the EJML matrix library through Maven.
 
 Requirements
 ------------
 
-- Java 8 or newer
-- Maven
+- JDK 26 or newer
+- Maven 3.9 or newer
 
 Build
 -----
@@ -37,6 +37,9 @@ Compile the project with:
 ```bash
 mvn compile
 ```
+
+The Maven build enforces JDK 26 or newer and compiles the project with
+`--release 26`.
 
 You can also open the project in any IDE with Maven support, such as IntelliJ
 IDEA, Eclipse, or NetBeans.
@@ -129,7 +132,7 @@ mvn exec:java \
 The checker:
 
 1. Reads the original system.
-2. Solves it using the JAMA library.
+2. Solves it using the EJML library.
 3. Reads the processed result file.
 4. Checks whether the processed matrix is the identity matrix.
 5. Checks whether the processed right-hand-side vector matches the expected

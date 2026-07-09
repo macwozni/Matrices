@@ -1,10 +1,10 @@
 package pl.edu.agh.macwozni.matrixtw;
 
-import Jama.Matrix;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * @author macwozni
@@ -35,10 +35,10 @@ public class Checker {
 
         // solve
         //create data structures for solver
-        Matrix A = new Matrix(source.lhs);
-        Matrix b = new Matrix(source.rhs);
+        SimpleMatrix A = new SimpleMatrix(source.lhs);
+        SimpleMatrix b = new SimpleMatrix(source.rhs);
         // x=a/b
-        Matrix x = A.solve(b);
+        SimpleMatrix x = A.solve(b);
 
         MyMatrix processed;
         // read output file with processed/solved matrix
@@ -70,10 +70,10 @@ public class Checker {
         
         // check RHS vector - should be equal to the one from solved here initial problem
         for (int j = 0; j < processed.size; j++) {
-            if (!MyMatrix.compare(x.getArray()[j][0], processed.rhs[j][0], epsilon)) {
+            if (!MyMatrix.compare(x.get(j, 0), processed.rhs[j][0], epsilon)) {
                 // if it is not equal - print it to the output and exit
                 System.out.println("Error 3 " + (processed.size + 1) + " " + j);
-                System.out.println(x.getArray()[j][0] + " " + processed.rhs[j][0]);
+                System.out.println(x.get(j, 0) + " " + processed.rhs[j][0]);
                 System.exit(1);
             }
         }

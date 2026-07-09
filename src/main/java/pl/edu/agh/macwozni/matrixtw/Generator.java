@@ -1,12 +1,11 @@
 package pl.edu.agh.macwozni.matrixtw;
 
-import Jama.LUDecomposition;
-import Jama.Matrix;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import org.ejml.simple.SimpleMatrix;
 
 public class Generator {
 
@@ -27,12 +26,12 @@ public class Generator {
             System.exit(1);
         }
         
-        Matrix A;
-        Matrix B;
+        SimpleMatrix A;
+        SimpleMatrix B;
         do {
             // generate random system of equations
-            A = Matrix.random(n, n);
-            B = Matrix.random(n, 1);
+            A = SimpleMatrix.random_DDRM(n, n);
+            B = SimpleMatrix.random_DDRM(n, 1);
         } while (!isAcceptable(A, n));
         
         // open file for output - unsolved system of equations
@@ -47,14 +46,14 @@ public class Generator {
         // print matrix
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                System.out.print(A.getArray()[i][j] + " ");
+                System.out.print(A.get(i, j) + " ");
             }
             System.out.println();
         }
 
         // print RHS
         for (int j = 0; j < n; j++) {
-            System.out.print(B.getArray()[j][0] + " ");
+            System.out.print(B.get(j, 0) + " ");
         }
         System.out.println();
 
@@ -79,10 +78,10 @@ public class Generator {
             System.out.println();
         }
         // solve system of equations
-        Matrix x = A.solve(B);
+        SimpleMatrix x = A.solve(B);
         // print solution
         for (int j = 0; j < n; j++) {
-            System.out.print(x.getArray()[j][0] + " ");
+            System.out.print(x.get(j, 0) + " ");
         }
         System.out.println();
     }
@@ -92,9 +91,9 @@ public class Generator {
      * @param size size of the matrix
      * @return true if matrix is nonsingular and does not require pivoting
      */
-    static boolean isAcceptable(Matrix matrix, int size) {
-        LUDecomposition lu = matrix.lu();
-        return lu.isNonsingular() && !requiresPivot(matrix.getArray(), size);
+    static boolean isAcceptable(SimpleMatrix matrix, int size) {
+        boolean nonsingular = !MyMatrix.compare(0., matrix.determinant(), epsilon);
+        return nonsingular && !requiresPivot(matrix.toArray2(), size);
     }
 
     /**
