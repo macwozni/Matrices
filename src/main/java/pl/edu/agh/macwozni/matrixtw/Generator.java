@@ -1,89 +1,122 @@
 package pl.edu.agh.macwozni.matrixtw;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.ejml.simple.SimpleMatrix;
 
 public class Generator {
 
     // machine precision epsilon
-    static double epsilon = 0.00001;
+    static final double EPSILON = 0.00001;
 
-    public static void main(String args[]) throws FileNotFoundException, IOException {
+    public static void main(String args[]) throws IOException {
         // if there are more or less arguments then matrix size and 2 file addresses
         if (args.length != 3) {
             System.err.print("wrong amount of arguments");
             System.exit(1);
+            return;
         }
 
         // parse matrix size
-        int n = Integer.parseInt(args[0]);
-        if (n <= 0) {
-            System.err.print("matrix size must be positive");
+        int n;
+        try {
+            n = parseMatrixSize(args[0]);
+        } catch (IllegalArgumentException exception) {
+            System.err.print(exception.getMessage());
             System.exit(1);
+            return;
         }
-        
+
+        GeneratedSystem system = generateSystem(n);
+
+        // write unsolved system of equations
+        writeSource(Path.of(args[1]), system);
+
+        // write solved system of equations
+        writeSolution(Path.of(args[2]), system);
+    }
+
+    static GeneratedSystem generateSystem(int size) {
         SimpleMatrix A;
         SimpleMatrix B;
         do {
             // generate random system of equations
-            A = SimpleMatrix.random_DDRM(n, n);
-            B = SimpleMatrix.random_DDRM(n, 1);
-        } while (!isAcceptable(A, n));
-        
-        // open file for output - unsolved system of equations
-        File file = new File(args[1]);
-        FileOutputStream fos = new FileOutputStream(file);
-        PrintStream ps = new PrintStream(fos);
-        // set default output stream to file
-        System.setOut(ps);
-        
-        // print matrix size
-        System.out.println(n);
-        // print matrix
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.print(A.get(i, j) + " ");
-            }
-            System.out.println();
+            A = SimpleMatrix.random_DDRM(size, size);
+            B = SimpleMatrix.random_DDRM(size, 1);
+        } while (!isAcceptable(A, size));
+
+        return new GeneratedSystem(size, A, B, A.solve(B));
+    }
+
+    static int parseMatrixSize(String value) {
+        int size;
+        try {
+            size = Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("matrix size must be an integer", exception);
         }
+        if (size <= 0) {
+            throw new IllegalArgumentException("matrix size must be positive");
+        }
+        return size;
+    }
+
+    static void writeSource(Path path, GeneratedSystem system) throws IOException {
+        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(path))) {
+            writeSource(out, system);
+        }
+    }
+
+    static void writeSolution(Path path, GeneratedSystem system) throws IOException {
+        try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(path))) {
+            writeSolution(out, system);
+        }
+    }
+
+    private static void writeSource(PrintWriter out, GeneratedSystem system) {
+        // print matrix size
+        out.println(system.size());
+        // print matrix
+        writeMatrix(out, system.leftHandSide());
 
         // print RHS
-        for (int j = 0; j < n; j++) {
-            System.out.print(B.get(j, 0) + " ");
-        }
-        System.out.println();
+        writeVector(out, system.rightHandSide());
+    }
 
-        // open file for output - solved system of equations
-        file = new File(args[2]);
-        fos = new FileOutputStream(file);
-        ps = new PrintStream(fos);
-        // set default output stream to file
-        System.setOut(ps);
-        
+    private static void writeSolution(PrintWriter out, GeneratedSystem system) {
         // print size of matrix
-        System.out.println(n);
+        out.println(system.size());
         // matrix has 1.0 on diagonal, 0.0 elsewhere
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i == j) {
-                    System.out.print(1. + " ");
-                } else {
-                    System.out.print(0. + " ");
-                }
-            }
-            System.out.println();
-        }
-        // solve system of equations
-        SimpleMatrix x = A.solve(B);
+        writeIdentity(out, system.size());
         // print solution
-        for (int j = 0; j < n; j++) {
-            System.out.print(x.get(j, 0) + " ");
+        writeVector(out, system.solution());
+    }
+
+    private static void writeMatrix(PrintWriter out, SimpleMatrix matrix) {
+        for (int i = 0; i < matrix.getNumRows(); i++) {
+            for (int j = 0; j < matrix.getNumCols(); j++) {
+                out.print(matrix.get(i, j) + " ");
+            }
+            out.println();
         }
-        System.out.println();
+    }
+
+    private static void writeIdentity(PrintWriter out, int size) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                out.print((i == j ? 1.0 : 0.0) + " ");
+            }
+            out.println();
+        }
+    }
+
+    private static void writeVector(PrintWriter out, SimpleMatrix vector) {
+        for (int j = 0; j < vector.getNumRows(); j++) {
+            out.print(vector.get(j, 0) + " ");
+        }
+        out.println();
     }
 
     /**
@@ -92,7 +125,7 @@ public class Generator {
      * @return true if matrix is nonsingular and does not require pivoting
      */
     static boolean isAcceptable(SimpleMatrix matrix, int size) {
-        boolean nonsingular = !MyMatrix.compare(0., matrix.determinant(), epsilon);
+        boolean nonsingular = !MyMatrix.compare(0., matrix.determinant(), EPSILON);
         return nonsingular && !requiresPivot(matrix.toArray2(), size);
     }
 
@@ -112,7 +145,7 @@ public class Generator {
         // for each row
         for (int i = 0; i < size; i++) {
             // check if we have 0.0 on diagonal
-            if (MyMatrix.compare(0., matrix[i][i], epsilon)) {
+            if (MyMatrix.compare(0., matrix[i][i], EPSILON)) {
                 // if yes - return true
                 return true;
             }
@@ -129,5 +162,9 @@ public class Generator {
 
         // now we know, that pivoting is not required during elimination
         return false;
+    }
+
+    record GeneratedSystem(int size, SimpleMatrix leftHandSide, SimpleMatrix rightHandSide,
+            SimpleMatrix solution) {
     }
 }

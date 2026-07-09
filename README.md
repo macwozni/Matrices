@@ -18,10 +18,12 @@ Project Structure
 src/main/java/pl/edu/agh/macwozni/matrixtw/
   Generator.java  Generates input and reference output files.
   Checker.java    Checks a student's output file.
-  MyMatrix.java   Reads matrix files and compares floating-point values.
+  MyMatrix.java   Represents parsed matrix files and compares floating-point values.
+src/test/java/pl/edu/agh/macwozni/matrixtw/
+  *Test.java      Unit tests for parsing, generation, and checking.
 ```
 
-The project uses the EJML matrix library through Maven.
+The project uses the EJML matrix library and JUnit tests through Maven.
 
 Requirements
 ------------
@@ -40,6 +42,12 @@ mvn compile
 
 The Maven build enforces JDK 26 or newer and compiles the project with
 `--release 26`.
+
+Run the unit test suite with:
+
+```bash
+mvn test
+```
 
 You can also open the project in any IDE with Maven support, such as IntelliJ
 IDEA, Eclipse, or NetBeans.
