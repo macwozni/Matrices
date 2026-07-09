@@ -1,0 +1,61 @@
+import org.gradle.external.javadoc.JavadocMemberLevel
+
+plugins {
+    id 'java'
+}
+
+group = 'pl.edu.agh.macwozni'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
+}
+
+dependencies {
+    implementation 'org.ejml:ejml-simple:0.46.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.1'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 26
+}
+
+tasks.withType(Javadoc).configureEach {
+    failOnError = true
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    options.docEncoding = 'UTF-8'
+    options.memberLevel = JavadocMemberLevel.PRIVATE
+    options.addBooleanOption('Werror', true)
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+tasks.register('runGenerator', JavaExec) {
+    group = 'application'
+    description = 'Runs the matrix source/reference generator.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'pl.edu.agh.macwozni.matrixtw.Generator'
+}
+
+tasks.register('runChecker', JavaExec) {
+    group = 'application'
+    description = 'Runs the processed matrix checker.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'pl.edu.agh.macwozni.matrixtw.Checker'
+}
+
+tasks.named('wrapper') {
+    gradleVersion = '9.6.1'
+    distributionType = Wrapper.DistributionType.BIN
+}

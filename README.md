@@ -1,7 +1,7 @@
 MatrixTW
 ========
 
-MatrixTW is a small Java/Maven project used during the "Teoria Wspolbieznosci"
+MatrixTW is a small Java project used during the "Teoria Wspolbieznosci"
 classes. It helps prepare and verify test cases for student implementations of
 Gaussian elimination.
 
@@ -23,18 +23,20 @@ src/test/java/pl/edu/agh/macwozni/matrixtw/
   *Test.java      Unit tests for parsing, generation, and checking.
 ```
 
-The project uses the EJML matrix library and JUnit tests through Maven.
+The project uses the EJML matrix library and JUnit tests. It can be built with
+either Maven or the included Gradle wrapper.
 
 Requirements
 ------------
 
 - JDK 26 or newer
 - Maven 3.9 or newer
+- Gradle 9.6.1 or newer, or the included Gradle wrapper
 
 Build
 -----
 
-Compile the project with:
+Compile the project with Maven:
 
 ```bash
 mvn compile
@@ -43,19 +45,42 @@ mvn compile
 The Maven build enforces JDK 26 or newer and compiles the project with
 `--release 26`.
 
-Run the unit test suite with:
+Compile the project with Gradle:
+
+```bash
+./gradlew compileJava
+```
+
+The Gradle build uses the Java 26 toolchain and also compiles with
+`--release 26`.
+
+Run the unit test suite with Maven:
 
 ```bash
 mvn test
 ```
 
-Generate the API documentation with:
+Run the unit test suite with Gradle:
+
+```bash
+./gradlew test
+```
+
+Generate the API documentation with Maven:
 
 ```bash
 mvn javadoc:javadoc
 ```
 
-The generated documentation is written to `target/reports/apidocs/`.
+The Maven documentation is written to `target/reports/apidocs/`.
+
+Generate the API documentation with Gradle:
+
+```bash
+./gradlew javadoc
+```
+
+The Gradle documentation is written to `build/docs/javadoc/`.
 
 You can also open the project in any IDE with Maven support, such as IntelliJ
 IDEA, Eclipse, or NetBeans.
@@ -121,6 +146,12 @@ mvn exec:java \
   -Dexec.args="10 out10.txt res10.txt"
 ```
 
+Gradle example:
+
+```bash
+./gradlew runGenerator --args="10 out10.txt res10.txt"
+```
+
 The generated matrix is checked before being written. The generator avoids
 singular systems and systems that would require pivoting because of a numerical
 zero on the diagonal during simple Gaussian elimination.
@@ -143,6 +174,12 @@ Example:
 mvn exec:java \
   -Dexec.mainClass=pl.edu.agh.macwozni.matrixtw.Checker \
   -Dexec.args="out10.txt student_result.txt"
+```
+
+Gradle example:
+
+```bash
+./gradlew runChecker --args="out10.txt student_result.txt"
 ```
 
 The checker:
