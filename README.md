@@ -49,6 +49,14 @@ Run the unit test suite with:
 mvn test
 ```
 
+Generate the API documentation with:
+
+```bash
+mvn javadoc:javadoc
+```
+
+The generated documentation is written to `target/reports/apidocs/`.
+
 You can also open the project in any IDE with Maven support, such as IntelliJ
 IDEA, Eclipse, or NetBeans.
 

@@ -6,11 +6,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.ejml.simple.SimpleMatrix;
 
+/**
+ * Command-line tool for creating Gaussian elimination test files.
+ *
+ * <p>The generator creates two files for a random linear system:
+ * the source file contains the matrix equation {@code A * x = b}, while the
+ * reference file contains the identity matrix and the exact solution vector
+ * computed with EJML. Generated matrices are filtered so they are nonsingular
+ * and do not require pivoting during simple Gaussian elimination.</p>
+ */
 public class Generator {
 
-    // machine precision epsilon
+    /**
+     * Absolute tolerance used when checking whether a floating-point value is
+     * numerically zero.
+     */
     static final double EPSILON = 0.00001;
 
+    /**
+     * Generates a source matrix file and a matching reference solution file.
+     *
+     * <p>The expected argument order is:</p>
+     *
+     * <pre>{@code
+     * <matrix size> <source output file> <reference output file>
+     * }</pre>
+     *
+     * @param args command-line arguments
+     * @throws IOException if either output file cannot be written
+     */
     public static void main(String args[]) throws IOException {
         // if there are more or less arguments then matrix size and 2 file addresses
         if (args.length != 3) {
@@ -38,6 +62,15 @@ public class Generator {
         writeSolution(Path.of(args[2]), system);
     }
 
+    /**
+     * Creates a random linear system that is suitable for the assignment.
+     *
+     * <p>The returned matrix is nonsingular and can be processed by plain
+     * Gaussian elimination without pivoting.</p>
+     *
+     * @param size number of equations and unknowns
+     * @return generated source system and its solution
+     */
     static GeneratedSystem generateSystem(int size) {
         SimpleMatrix A;
         SimpleMatrix B;
@@ -50,6 +83,13 @@ public class Generator {
         return new GeneratedSystem(size, A, B, A.solve(B));
     }
 
+    /**
+     * Parses and validates the matrix size passed on the command line.
+     *
+     * @param value text value to parse
+     * @return positive matrix size
+     * @throws IllegalArgumentException if the value is not an integer or is not positive
+     */
     static int parseMatrixSize(String value) {
         int size;
         try {
@@ -63,18 +103,38 @@ public class Generator {
         return size;
     }
 
+    /**
+     * Writes the generated source system to a matrix file.
+     *
+     * @param path destination file path
+     * @param system generated system to write
+     * @throws IOException if the destination file cannot be written
+     */
     static void writeSource(Path path, GeneratedSystem system) throws IOException {
         try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(path))) {
             writeSource(out, system);
         }
     }
 
+    /**
+     * Writes the reference solution to a matrix file.
+     *
+     * @param path destination file path
+     * @param system generated system whose solution should be written
+     * @throws IOException if the destination file cannot be written
+     */
     static void writeSolution(Path path, GeneratedSystem system) throws IOException {
         try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(path))) {
             writeSolution(out, system);
         }
     }
 
+    /**
+     * Writes the source representation of a generated system.
+     *
+     * @param out writer receiving the matrix file contents
+     * @param system generated system to write
+     */
     private static void writeSource(PrintWriter out, GeneratedSystem system) {
         // print matrix size
         out.println(system.size());
@@ -85,6 +145,12 @@ public class Generator {
         writeVector(out, system.rightHandSide());
     }
 
+    /**
+     * Writes the solved representation of a generated system.
+     *
+     * @param out writer receiving the matrix file contents
+     * @param system generated system to write
+     */
     private static void writeSolution(PrintWriter out, GeneratedSystem system) {
         // print size of matrix
         out.println(system.size());
@@ -94,6 +160,12 @@ public class Generator {
         writeVector(out, system.solution());
     }
 
+    /**
+     * Writes all values from a matrix in row-major order.
+     *
+     * @param out writer receiving the matrix rows
+     * @param matrix matrix to write
+     */
     private static void writeMatrix(PrintWriter out, SimpleMatrix matrix) {
         for (int i = 0; i < matrix.getNumRows(); i++) {
             for (int j = 0; j < matrix.getNumCols(); j++) {
@@ -103,6 +175,12 @@ public class Generator {
         }
     }
 
+    /**
+     * Writes an identity matrix with the project matrix-file formatting.
+     *
+     * @param out writer receiving the matrix rows
+     * @param size number of rows and columns
+     */
     private static void writeIdentity(PrintWriter out, int size) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -112,6 +190,12 @@ public class Generator {
         }
     }
 
+    /**
+     * Writes a column vector as one whitespace-separated line.
+     *
+     * @param out writer receiving the vector line
+     * @param vector column vector to write
+     */
     private static void writeVector(PrintWriter out, SimpleMatrix vector) {
         for (int j = 0; j < vector.getNumRows(); j++) {
             out.print(vector.get(j, 0) + " ");
@@ -120,9 +204,11 @@ public class Generator {
     }
 
     /**
-     * @param matrix matrix for generated system
-     * @param size size of the matrix
-     * @return true if matrix is nonsingular and does not require pivoting
+     * Checks whether a generated matrix can be used as a test input.
+     *
+     * @param matrix candidate left-hand-side matrix
+     * @param size number of rows and columns in the matrix
+     * @return {@code true} if the matrix is nonsingular and does not require pivoting
      */
     static boolean isAcceptable(SimpleMatrix matrix, int size) {
         boolean nonsingular = !MyMatrix.compare(0., matrix.determinant(), EPSILON);
@@ -130,12 +216,16 @@ public class Generator {
     }
 
     /**
-     * @param m matrix for gaussian elimination
-     * @param size size of the matrix
-     * @return true if matrix requires pivoting during gaussian elimination
-     * This subroutine checks if matrix requires pivoting during simple gaussian elimination.
+     * Checks whether plain Gaussian elimination would require pivoting.
+     *
+     * <p>The input matrix is copied before elimination, so this method does not
+     * modify the caller's array.</p>
+     *
+     * @param m matrix for Gaussian elimination
+     * @param size number of rows and columns to inspect
+     * @return {@code true} if a numerically zero pivot appears during elimination
      */
-    static boolean requiresPivot(double m[][], int size) {
+    static boolean requiresPivot(double[][] m, int size) {
         // Work on a copy so checking does not change the generated matrix.
         double[][] matrix = new double[size][size];
         for (int i = 0; i < size; i++) {
@@ -164,6 +254,14 @@ public class Generator {
         return false;
     }
 
+    /**
+     * Complete generated test case.
+     *
+     * @param size number of equations and unknowns
+     * @param leftHandSide matrix {@code A} from {@code A * x = b}
+     * @param rightHandSide vector {@code b} from {@code A * x = b}
+     * @param solution vector {@code x} that solves the generated system
+     */
     record GeneratedSystem(int size, SimpleMatrix leftHandSide, SimpleMatrix rightHandSide,
             SimpleMatrix solution) {
     }

@@ -6,16 +6,30 @@ import java.util.List;
 import org.ejml.simple.SimpleMatrix;
 
 /**
- * @author macwozni
+ * Command-line tool for validating processed Gaussian elimination results.
+ *
+ * <p>The checker reads the original system, solves it with EJML, and compares
+ * the student's processed output against the expected identity matrix and
+ * solution vector.</p>
  */
 public class Checker {
 
-    // machine precision epsilon
+    /**
+     * Absolute tolerance used when comparing floating-point values.
+     */
     static final double EPSILON = 0.00001;
 
     /**
-     * @param args should be 2 strings with addresses of 2 files with matrixes at given format
-     * @throws IOException if there is some problem with IO we just frow exception - from main subroutine...
+     * Validates a processed matrix file against a source matrix file.
+     *
+     * <p>The expected argument order is:</p>
+     *
+     * <pre>{@code
+     * <source matrix file> <processed matrix file>
+     * }</pre>
+     *
+     * @param args command-line arguments
+     * @throws IOException if either input file cannot be read
      */
     public static void main(String args[]) throws IOException {
         // if there are more or less arguments then 2 file addresses
@@ -37,6 +51,17 @@ public class Checker {
         }
     }
 
+    /**
+     * Checks a processed matrix file against the source system.
+     *
+     * <p>A successful processed file contains an identity matrix on the
+     * left-hand side and the correct solution vector on the right-hand side.</p>
+     *
+     * @param sourcePath path to the original generated system
+     * @param processedPath path to the processed student result
+     * @return success or failure with diagnostic lines
+     * @throws IOException if either matrix file cannot be read or parsed
+     */
     static CheckResult check(Path sourcePath, Path processedPath) throws IOException {
         // read source file with unprocessed unsolved matrix
         MyMatrix source = MyMatrix.read(sourcePath);
@@ -88,13 +113,30 @@ public class Checker {
         return new CheckResult.Success();
     }
 
+    /**
+     * Result of checking a processed matrix file.
+     */
     public sealed interface CheckResult permits CheckResult.Success, CheckResult.Failure {
 
+        /**
+         * Successful check result.
+         */
         record Success() implements CheckResult {
         }
 
+        /**
+         * Failed check result with the exact diagnostic lines printed by the
+         * command-line checker.
+         *
+         * @param lines diagnostic lines describing the first detected problem
+         */
         record Failure(List<String> lines) implements CheckResult {
 
+            /**
+             * Creates a failure result.
+             *
+             * @throws IllegalArgumentException if {@code lines} is {@code null} or empty
+             */
             public Failure {
                 if (lines == null || lines.isEmpty()) {
                     throw new IllegalArgumentException("Failure must contain at least one line");
@@ -102,6 +144,11 @@ public class Checker {
                 lines = List.copyOf(lines);
             }
 
+            /**
+             * Creates a failure result containing one diagnostic line.
+             *
+             * @param line diagnostic line describing the problem
+             */
             public Failure(String line) {
                 this(List.of(line));
             }
