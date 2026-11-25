@@ -22,6 +22,9 @@ public record MyMatrix(int size, double[][] lhs, double[][] rhs) {
     /**
      * Creates an immutable-by-copy matrix representation.
      *
+     * @param size number of rows and columns in the left-hand-side matrix
+     * @param lhs left-hand-side matrix values
+     * @param rhs right-hand-side vector stored as an {@code n x 1} matrix
      * @throws IllegalArgumentException if the size is not positive or the arrays
      *         do not match the expected dimensions
      */

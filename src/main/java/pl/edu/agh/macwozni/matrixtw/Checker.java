@@ -41,14 +41,9 @@ public class Checker {
         }
 
         CheckResult result = check(Path.of(args[0]), Path.of(args[1]));
-        switch (result) {
-            case CheckResult.Success success -> {
-                // nothing to print for a correct result
-            }
-            case CheckResult.Failure failure -> {
-                failure.lines().forEach(System.out::println);
-                System.exit(1);
-            }
+        if (result instanceof CheckResult.Failure failure) {
+            failure.lines().forEach(System.out::println);
+            System.exit(1);
         }
     }
 
@@ -136,6 +131,7 @@ public class Checker {
             /**
              * Creates a failure result.
              *
+             * @param lines diagnostic lines describing the first detected problem
              * @throws IllegalArgumentException if {@code lines} is {@code null} or empty
              */
             public Failure {

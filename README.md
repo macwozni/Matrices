@@ -29,8 +29,8 @@ either Maven or the included Gradle wrapper.
 Requirements
 ------------
 
-- JDK 26 or newer
-- Maven 3.9 or newer
+- JDK 17 or newer
+- Maven 3.9.0 or newer
 - Gradle 9.6.1 or newer, or the included Gradle wrapper
 
 Build
@@ -42,8 +42,8 @@ Compile the project with Maven:
 mvn compile
 ```
 
-The Maven build enforces JDK 26 or newer and compiles the project with
-`--release 26`.
+The Maven build enforces JDK 17 or newer and compiles the project with
+`--release 17`.
 
 Compile the project with Gradle:
 
@@ -51,8 +51,8 @@ Compile the project with Gradle:
 ./gradlew compileJava
 ```
 
-The Gradle build uses the Java 26 toolchain and also compiles with
-`--release 26`.
+The Gradle build uses the Java 17 toolchain and also compiles with
+`--release 17`.
 
 Run the unit test suite with Maven:
 
